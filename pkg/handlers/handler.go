@@ -11,8 +11,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// Endpoints fo registration & authorization
 	auth := router.Group("/auth")
 	{
-		auth.POST("/sign-up")
-		auth.POST("/sign-in")
+		auth.POST("/sign-up", h.signUp)
+		auth.POST("/sign-in", h.signIn)
 	}
 
 	// api for working with todo lists & their items
@@ -20,21 +20,21 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		lists := api.Group("/lists")
 		{
-			lists.POST("/")
-			lists.GET("/")
+			lists.POST("/", h.createList)
+			lists.GET("/", h.getAllLists)
 			// for anyone who has connection with list on id
-			lists.GET("/:id")
-			lists.PUT("/:id")
-			lists.DELETE("/:id")
+			lists.GET("/:id", h.getListById)
+			lists.PUT("/:id", h.updateList)
+			lists.DELETE("/:id", h.deleteList)
 		}
 
 		items := lists.Group(":id/items")
 		{
-			items.POST("/")
-			items.GET("/")
-			items.GET("/:item_id")
-			items.PUT("/:item_id")
-			items.DELETE("/:item_id")
+			items.POST("/", h.createItem)
+			items.GET("/", h.getAllItems)
+			items.GET("/:item_id", h.getItemById)
+			items.PUT("/:item_id", h.updateItem)
+			items.DELETE("/:item_id", h.deleteItem)
 		}
 	}
 	return router
