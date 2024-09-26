@@ -10,9 +10,10 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func (s *Server) Run(port string) error {
+func (s *Server) Run(port string, handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr: ":" + port,
+		Addr:    ":" + port,
+		Handler: handler,
 		// Size of the HTTP request header allowed.
 		MaxHeaderBytes: 1 << 20, // 1mb
 		// Timeouts when server cannot read/write data from client for 10s
