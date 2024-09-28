@@ -29,9 +29,7 @@ func (s *Service) Authenticate(user user.User) error {
 func (s *Service) Registration(user user.User) error {
 	err := s.storage.InsertUser(user)
 	if err != nil {
-		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == uniqueViolationErr {
-			return nil
-		}
+		return err
 	}
 	return nil
 }
@@ -50,5 +48,3 @@ type Service struct {
 func New(repos *storage.Storage) *Service {
 	return &Service{}
 }
-
-func (s *Service) VerifyUser(user user.User) error {

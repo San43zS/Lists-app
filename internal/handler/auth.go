@@ -29,7 +29,19 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
-	h.services.Authorization.
+	var user user2.User
+
+	if err := c.BindJSON(&user); err != nil {
+		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.services.Authorization.Authenticate(user); err != nil {
+		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSONP(http.StatusOK, gin.H{"message": "user authorized"})
 }
 
 func (h *Handler) signOut(c *gin.Context) {

@@ -9,14 +9,13 @@ import (
 	user2 "os/user"
 )
 
+type Storage struct {
+	db *sqlx.DB
+}
+
 type DB interface {
 	VerifyUser(user user.User) error
 	InsertUser(user user.User) error
-	MatchUserData(user user.User) (bool, error)
-}
-
-type Storage struct {
-	DB
 }
 
 type dbConfig struct {
@@ -39,23 +38,10 @@ func getDBConfig() dbConfig {
 
 // есть ли такой user уже
 func (s *Storage) VerifyUser(user user.User) error {
-	dbEssence := getDBConfig()
-
-	// Создаем строку подключения к базе данных
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		dbEssence.Host, dbEssence.Port, dbEssence.User, dbEssence.Password, dbEssence.Database)
-
-	// Подключаемся к базе данных
-	db, err := sqlx.Connect("postgres", connStr)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
 	// Выполняем запрос к базе данных
 	query := "SELECT * FROM users WHERE email = $1"
 	var existingUser user2.User
-	err = db.Get(&existingUser, query, user.Email)
+	err := s.db.Get(&existingUser, query, user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return err
@@ -68,6 +54,17 @@ func (s *Storage) VerifyUser(user user.User) error {
 
 // добавляем нового пользователя
 func (s *Storage) InsertUser(user user.User) error {
+	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
+
+	_, err := s.db.Exec(query, user.Email, user.Username, user.Password)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func New() DB {
 	dbEssence := getDBConfig()
 
 	// Создаем строку подключения к базе данных
@@ -77,20 +74,11 @@ func (s *Storage) InsertUser(user user.User) error {
 	// Подключаемся к базе данных
 	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
-		return err
+		return nil
 	}
 	defer db.Close()
 
-	// Выполняем запрос к базе данных
-	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
-	_, err = db.Exec(query, user.Email, user.Username, user.Password)
-	if err != nil {
-		return err
+	return &Storage{
+		db: db,
 	}
-	// Если пользователь добавлен, возвращаем nil
-	return nil
-}
-
-func New() *Storage {
-	return &Storage{}
 }
