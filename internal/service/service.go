@@ -2,6 +2,7 @@ package service
 
 import (
 	"Lists-app/internal/model/user"
+	"Lists-app/internal/service/auth"
 	"Lists-app/internal/storage"
 	"github.com/lib/pq"
 )
@@ -9,12 +10,6 @@ import (
 const (
 	uniqueViolationErr = "23505"
 )
-
-type Authorization interface {
-	Registration(user user.User) error
-	Authenticate(user user.User) error
-	GenerateToken(user user.User) (string, error)
-}
 
 func (s *Service) Authenticate(user user.User) error {
 	err := s.storage.VerifyUser(user)
@@ -34,17 +29,11 @@ func (s *Service) Registration(user user.User) error {
 	return nil
 }
 
-type TodoList interface {
-}
-
-type TodoItem interface {
-}
-
 type Service struct {
 	storage *storage.Storage
-	Authorization
+	auth.Autorization
 }
 
-func New(repos *storage.Storage) *Service {
+func New(repos storage.Storage) *Service {
 	return &Service{}
 }

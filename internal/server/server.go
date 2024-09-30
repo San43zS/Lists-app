@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
@@ -10,9 +11,9 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func New(port string, handler http.Handler) *Server {
+func New(handler http.Handler) *Server {
 	var httpServer = &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + viper.GetString("http_port"),
 		Handler: handler,
 		// Size of the HTTP request header allowed.
 		MaxHeaderBytes: 1 << 20, // 1mb
@@ -24,11 +25,11 @@ func New(port string, handler http.Handler) *Server {
 	return &Server{httpServer: httpServer}
 }
 
-func (s *Server) Run() error {
+func (s Server) Run() error {
 	return s.httpServer.ListenAndServe()
 }
 
 // ctx - is a contex of the running server
-func (s *Server) Shutdown(ctx context.Context) error {
+func (s Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
 }

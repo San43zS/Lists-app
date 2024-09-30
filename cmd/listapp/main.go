@@ -1,10 +1,7 @@
 package main
 
 import (
-	"Lists-app/internal/handler"
-	Lists_app "Lists-app/internal/server"
-	"Lists-app/internal/service"
-	"Lists-app/internal/storage"
+	"Lists-app/internal/app"
 	"github.com/spf13/viper"
 	"log"
 )
@@ -20,12 +17,10 @@ func init() {
 }
 
 func main() {
-	storages := storage.New()
-	services := service.New(storages)
-	handlers := handler.New(services)
-
-	// TODO server := Lists_app.New()
-	var server = Lists_app.New(":8080", handlers.InitRoutes())
+	server, err := app.New()
+	if err != nil {
+		log.Fatalf("error occured while creating server: %v", err)
+	}
 
 	if err := server.Run(); err != nil {
 		log.Fatalf("error occured while running http server: %v", err)

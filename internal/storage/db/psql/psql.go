@@ -31,10 +31,10 @@ func New(config config.Config) (storage.Storage, error) {
 	}, nil
 }
 
-func (s *Store) User() user2.User {
+func (s Store) User() user2.User {
 	return s.user
 }
 
-func (s *Store) Notification() notification.Notification {
+func (s Store) Notification() notification.Notification {
 	return s.notification
 }
