@@ -5,7 +5,8 @@ import (
 	"Lists-app/internal/storage/api/notification"
 	user2 "Lists-app/internal/storage/api/user"
 	"Lists-app/internal/storage/config"
-	"Lists-app/internal/storage/db/psql/repo/notification"
+	notification2 "Lists-app/internal/storage/db/psql/repo/notification"
+	"Lists-app/internal/storage/db/psql/repo/user"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -25,8 +26,8 @@ func New(config config.Config) (storage.Storage, error) {
 	}
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	return &Store{
-		user:         user2.New(db),
-		notification: notification.New(db),
+		user:         user.New(db),
+		notification: notification2.New(db),
 	}, nil
 }
 

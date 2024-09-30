@@ -7,11 +7,16 @@ import (
 )
 
 type user struct {
-	db   *sqlx.DB
-	user user2.User
+	db *sqlx.DB
 }
 
-func (u *user) GetById(Id int) (user22.User, error) {
+func New(db *sqlx.DB) user2.User {
+	return user{
+		db: db,
+	}
+}
+
+func (u user) GetById(Id int) (user22.User, error) {
 	query := "SELECT * FROM users WHERE Id = $1"
 	var existingUser user22.User
 
@@ -22,7 +27,7 @@ func (u *user) GetById(Id int) (user22.User, error) {
 	return existingUser, nil
 }
 
-func (u *user) Verify(user user22.User) (bool, error) {
+func (u user) Verify(user user22.User) (bool, error) {
 	// Выполняем запрос к базе данных
 	query := "SELECT * FROM users WHERE email = $1 AND password = $2 AND username = $3"
 	var existingUser user2.User
@@ -33,7 +38,7 @@ func (u *user) Verify(user user22.User) (bool, error) {
 	return true, nil
 }
 
-func (u *user) Insert(user user22.User) error {
+func (u user) Insert(user user22.User) error {
 	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
 
 	_, err := u.db.Exec(query, user.Email, user.Username, user.Password)
@@ -41,5 +46,10 @@ func (u *user) Insert(user user22.User) error {
 		return err
 	}
 
+	return nil
+}
+
+func (u user) Delete(user user22.User) error {
+	// Выполняем запрос к базе данных
 	return nil
 }
