@@ -14,12 +14,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Authorization.Authenticate(user); err != nil {
-		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := h.services.Authorization.Registration(user); err != nil {
+	if err := h.services.Autorization.Registration; err != nil {
 		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -36,7 +31,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Authorization.Authenticate(user); err != nil {
+	if err := h.services.Authenticate(user); err != nil {
 		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
