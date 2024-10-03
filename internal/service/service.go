@@ -12,10 +12,12 @@ const (
 
 type Service struct {
 	storage *storage.Storage
+
 	auth.Autorization
 	notification.Notification
 }
 
 func New(repos storage.Storage) *Service {
+
 	return &Service{}
 }

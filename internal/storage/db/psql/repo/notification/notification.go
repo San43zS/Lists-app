@@ -11,6 +11,7 @@ type repository struct {
 }
 
 func New(db *sqlx.DB) notification2.Notification {
+
 	return repository{
 		db: db,
 	}
