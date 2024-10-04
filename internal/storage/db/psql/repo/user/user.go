@@ -3,6 +3,7 @@ package user
 import (
 	user22 "Lists-app/internal/model/user"
 	user2 "Lists-app/internal/storage/api/user"
+	"context"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,7 +17,7 @@ func New(db *sqlx.DB) user2.User {
 	}
 }
 
-func (r repository) GetById(Id int) (user22.User, error) {
+func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
 	query := "SELECT * FROM users WHERE Id = $1"
 	var existingUser user22.User
 
@@ -27,7 +28,7 @@ func (r repository) GetById(Id int) (user22.User, error) {
 	return existingUser, nil
 }
 
-func (r repository) Verify(user user22.User) (bool, error) {
+func (r repository) Verify(ctx context.Context, user user22.User) (bool, error) {
 	// Выполняем запрос к базе данных
 	query := "SELECT * FROM users WHERE email = $1 AND password = $2 AND username = $3"
 	var existingUser user2.User
@@ -38,7 +39,7 @@ func (r repository) Verify(user user22.User) (bool, error) {
 	return true, nil
 }
 
-func (r repository) Insert(user user22.User) error {
+func (r repository) Insert(ctx context.Context, user user22.User) error {
 	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
 
 	_, err := r.db.Exec(query, user.Email, user.Username, user.Password)
@@ -49,7 +50,7 @@ func (r repository) Insert(user user22.User) error {
 	return nil
 }
 
-func (r repository) Delete(user user22.User) error {
+func (r repository) Delete(ctx context.Context, user user22.User) error {
 	query := "DELETE FROM users WHERE id = $1"
 	_, err := r.db.Exec(query, user.Id)
 	if err != nil {
