@@ -6,10 +6,10 @@ import (
 )
 
 type Handler struct {
-	services *service.Service
+	services service.Service
 }
 
-func New(services *service.Service) *Handler {
+func New(services service.Service) *Handler {
 	return &Handler{services: services}
 }
 
@@ -27,24 +27,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// api for working with todo lists & their items
 	api := router.Group("/api")
 	{
-		lists := api.Group("/lists")
-		{
-			lists.POST("/", h.createList)
-			lists.GET("/", h.getAllLists)
-			// for anyone who has connection with list on id
-			lists.GET("/:id", h.getListById)
-			lists.PUT("/:id", h.updateList)
-			lists.DELETE("/:id", h.deleteList)
-		}
+		api.POST("/", h.viewAllNotify)
+		api.GET("/", h.createNotify)
+		// for anyone who has connection with list on id
+		api.GET("/:id", h.getListById)
+		api.PUT("/:id", h.updateList)
+		api.DELETE("/:id", h.deleteList)
 
-		items := lists.Group(":id/items")
-		{
-			items.POST("/", h.createItem)
-			items.GET("/", h.getAllItems)
-			items.GET("/:item_id", h.getItemById)
-			items.PUT("/:item_id", h.updateItem)
-			items.DELETE("/:item_id", h.deleteItem)
-		}
 	}
 	return router
 }
