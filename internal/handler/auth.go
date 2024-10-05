@@ -7,20 +7,24 @@ import (
 	"net/http"
 )
 
+type Response struct {
+	Message string `json:"message"`
+}
+
 func (h *Handler) signUp(c *gin.Context) {
 	var user user2.User
 
 	if err := c.BindJSON(&user); err != nil {
-		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSONP(http.StatusBadRequest, "Error receiving data")
 		return
 	}
 
 	if _, err := h.services.User().Verify(context.Background(), user); err != nil {
-		c.JSONP(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSONP(http.StatusBadRequest, "Error verifying user: "+err.Error())
 		return
 	}
 
-	c.JSONP(http.StatusOK, gin.H{"message": "user created"})
+	c.JSON(http.StatusOK, "user authorized")
 
 }
 

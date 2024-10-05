@@ -14,7 +14,7 @@ type Server struct {
 
 func New(handler http.Handler) *Server {
 	var httpServer = &http.Server{
-		Addr:    ":" + viper.GetString("http_port"),
+		Addr:    "localhost" + ":" + viper.GetString("http_port"),
 		Handler: handler,
 		// Size of the HTTP request header allowed.
 		MaxHeaderBytes: 1 << 20, // 1mb
@@ -27,7 +27,7 @@ func New(handler http.Handler) *Server {
 }
 
 func (s Server) Run() error {
-	fmt.Printf("Сервер запущен на адресе: http://localhost%s\n", s.httpServer.Addr)
+	fmt.Printf("Сервер запущен на адресе: http://%s\n", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
 
