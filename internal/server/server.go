@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/spf13/viper"
 	"net/http"
 	"time"
@@ -26,6 +27,7 @@ func New(handler http.Handler) *Server {
 }
 
 func (s Server) Run() error {
+	fmt.Printf("Сервер запущен на адресе: http://localhost%s\n", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
 

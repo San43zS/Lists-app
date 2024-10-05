@@ -15,28 +15,30 @@ type dbParams struct {
 	port     string
 	user     string
 	password string
-	database string
+	dbname   string
 }
 
-func getDBParams() dbParams {
-	return dbParams{
-		host:     viper.GetString(fmt.Sprintf("%s.host", "db")),
-		port:     viper.GetString(fmt.Sprintf("%s.port", "db")),
-		user:     viper.GetString(fmt.Sprintf("%s.user", "db")),
-		password: viper.GetString(fmt.Sprintf("%s.password", "db")),
-		database: viper.GetString(fmt.Sprintf("%s.database", "db")),
+func getDBParams() *dbParams {
+	return &dbParams{
+		host:     viper.GetString("HOST"),
+		port:     viper.GetString("PORT"),
+		user:     viper.GetString("USER"),
+		password: viper.GetString("PASSWORD"),
+		dbname:   viper.GetString("DBNAME"),
 	}
 }
 
 func (db dbParams) ParseURL() string {
-	template := viper.GetString(fmt.Sprintf("%s.urlTemplate", "db"))
+	template := viper.GetString("URLTEMPLATE")
 
-	return fmt.Sprintf(template, db.host, db.port, db.database, db.user, db.password)
+	return fmt.Sprintf(template, db.host, db.port, db.dbname, db.user, db.password)
 }
 
-func NewConfig() Config {
-	return Config{
-		URL:    getDBParams().ParseURL(),
-		Driver: viper.GetString(fmt.Sprintf("%s.driver", "db")),
+func NewConfig() *Config {
+	test := getDBParams()
+
+	return &Config{
+		URL:    test.ParseURL(),
+		Driver: viper.GetString("DRIVER"),
 	}
 }

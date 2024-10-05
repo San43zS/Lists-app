@@ -14,7 +14,8 @@ type app struct {
 }
 
 func New() (*app, error) {
-	storage, err := psql.New(config.NewConfig())
+	test := config.NewConfig()
+	storage, err := psql.New(test)
 	if err != nil {
 		return nil, err
 	}

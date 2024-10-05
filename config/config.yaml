@@ -1,1 +1,9 @@
 http_port: "8000"
+HOST: "localhost"
+PORT: "32768"
+USER: "postgres"
+PASSWORD: "pass"
+DBNAME: "test_db"
+
+DRIVER: "postgres"
+URLTEMPLATE: "host=%s port=%s dbname=%s user=%s password=%s sslmode=disable"

@@ -8,6 +8,7 @@ import (
 	notification2 "Lists-app/internal/storage/db/psql/repo/notification"
 	"Lists-app/internal/storage/db/psql/repo/user"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type Store struct {
@@ -15,8 +16,9 @@ type Store struct {
 	notification notification.Notification
 }
 
-func New(config config.Config) (storage.Storage, error) {
-	db, err := sqlx.Open(config.Driver, config.URL)
+func New(config *config.Config) (storage.Storage, error) {
+	test := config.Driver
+	db, err := sqlx.Open(test, config.URL)
 
 	if err != nil {
 		return nil, err

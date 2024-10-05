@@ -2,6 +2,8 @@ module Lists-app
 
 go 1.22.4
 
+require github.com/lib/pq v1.10.9
+
 require (
 	github.com/bytedance/sonic v1.12.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
