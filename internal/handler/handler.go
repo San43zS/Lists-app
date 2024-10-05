@@ -24,16 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-out", h.signOut)
 	}
 
-	// api for working with todo lists & their items
 	api := router.Group("/api")
 	{
 		api.POST("/", h.viewAllNotify)
-		api.GET("/", h.createNotify)
-		// for anyone who has connection with list on id
-		api.GET("/:id", h.getListById)
-		api.PUT("/:id", h.updateList)
-		api.DELETE("/:id", h.deleteList)
-
+		api.PUT("/:id", h.createNotify)
+		api.DELETE("/:id", h.deleteNotify)
 	}
 	return router
 }
