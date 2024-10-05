@@ -24,7 +24,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "user authorized")
+	c.JSON(http.StatusOK, "user already exists")
 
 }
 

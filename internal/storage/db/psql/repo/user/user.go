@@ -29,11 +29,17 @@ func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
 }
 
 func (r repository) Verify(ctx context.Context, user user22.User) (bool, error) {
-	// Выполняем запрос к базе данных
+	var existingUser user22.User
 	query := "SELECT * FROM users WHERE email = $1 AND password = $2 AND username = $3"
-	var existingUser user2.User
-	err := r.db.Get(&existingUser, query, user.Email, user.Password, user.Username)
+
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
+		return false, err
+	}
+
+	err = stmt.QueryRow(user.Email, user.Password, user.Username).Scan(&existingUser.Id, &existingUser.Email, &existingUser.Username, &existingUser.Password)
+
+	if err != nil || user.Email != existingUser.Email && user.Password != existingUser.Password && user.Username != existingUser.Username {
 		return false, err
 	}
 	return true, nil
