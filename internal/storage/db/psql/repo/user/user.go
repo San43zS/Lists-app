@@ -63,7 +63,7 @@ func (r repository) Verify(ctx context.Context, user user22.User) error {
 }
 
 func (r repository) Insert(ctx context.Context, user user22.User) error {
-	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
+	query := "INSERT INTO users (id, email, username, password) VALUES (DEFAULT, $1, $2, $3)"
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

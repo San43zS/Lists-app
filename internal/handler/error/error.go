@@ -1,25 +1,28 @@
 package error
 
-func ErrorResolver(err error) int {
-	//switch {
-	//
-	//case errors.Is(err, apperr.ErrUnknown):
-	//	return http.StatusInternalServerError
+import (
+	"errors"
+	"net/http"
 
-	//case errors.Is(err, apperr.ErrNoSuchCart):
-	//	return http.StatusBadRequest
-	//
-	//case errors.Is(err, apperr.ErrNoSuchItem):
-	//	return http.StatusBadRequest
-	//
-	//case errors.Is(err, apperr.ErrUrl):
-	//	return http.StatusBadRequest
-	//
-	//case errors.Is(err, apperr.ErrItemData):
-	//	return http.StatusBadRequest
-	//
-	//}
-	//
-	//return http.StatusInternalServerError
-	return 0
+	modelerror "Lists-app/internal/model/error"
+)
+
+func ErrorResolver(err error) int {
+	switch {
+
+	case errors.Is(err, modelerror.ErrUnknown):
+		return http.StatusInternalServerError
+
+	case errors.Is(err, modelerror.ErrVerifyUser):
+		return http.StatusBadRequest
+
+	case errors.Is(err, modelerror.ErrUserAlreadyExists):
+		return http.StatusBadRequest
+
+	case errors.Is(err, modelerror.ErrUserNotFound):
+		return http.StatusBadRequest
+
+	}
+
+	return http.StatusInternalServerError
 }
