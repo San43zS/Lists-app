@@ -17,7 +17,7 @@ func New(storage user.User) user.User {
 	}
 }
 
-func (s service) Verify(ctx context.Context, user user2.User) (bool, error) {
+func (s service) Verify(ctx context.Context, user user2.User) error {
 	return s.storage.Verify(ctx, user)
 }
 

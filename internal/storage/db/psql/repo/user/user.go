@@ -1,10 +1,13 @@
 package user
 
 import (
+	error2 "Lists-app/internal/model/error"
 	user22 "Lists-app/internal/model/user"
 	user2 "Lists-app/internal/storage/api/user"
 	"context"
+	"database/sql"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type repository struct {
@@ -18,39 +21,62 @@ func New(db *sqlx.DB) user2.User {
 }
 
 func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
-	query := "SELECT * FROM users WHERE Id = $1"
 	var existingUser user22.User
+	query := "SELECT * FROM users WHERE Id = $1"
 
-	err := r.db.Get(&existingUser, query, Id)
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return user22.User{}, err
+	}
+
+	err = stmt.QueryRowContext(ctx, Id).Scan(&existingUser.Id, &existingUser.Email, &existingUser.Username, &existingUser.Password)
+
 	if err != nil {
 		return user22.User{}, err
 	}
 	return existingUser, nil
 }
 
-func (r repository) Verify(ctx context.Context, user user22.User) (bool, error) {
+func (r repository) Verify(ctx context.Context, user user22.User) error {
 	var existingUser user22.User
 	query := "SELECT * FROM users WHERE email = $1 AND password = $2 AND username = $3"
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	err = stmt.QueryRow(user.Email, user.Password, user.Username).Scan(&existingUser.Id, &existingUser.Email, &existingUser.Username, &existingUser.Password)
+	err = stmt.QueryRowContext(ctx, user.Email, user.Password, user.Username).Scan(&existingUser.Id, &existingUser.Email, &existingUser.Username, &existingUser.Password)
 
-	if err != nil || user.Email != existingUser.Email && user.Password != existingUser.Password && user.Username != existingUser.Username {
-		return false, err
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return error2.ErrUserNotFound
+		} else {
+			return error2.ErrUnknown
+		}
 	}
-	return true, nil
+
+	if user.Email != existingUser.Email || user.Username != existingUser.Username || user.Password != existingUser.Password {
+		return error2.ErrVerifyUser
+	}
+	return nil
 }
 
 func (r repository) Insert(ctx context.Context, user user22.User) error {
-	query := "INSERT INTO users (id, email, username, password) VALUES (DEFAULT, $1, $2, $3) RETURNING id"
+	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
 
-	_, err := r.db.Exec(query, user.Email, user.Username, user.Password)
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
+	}
+
+	_, err = stmt.ExecContext(ctx, user.Email, user.Username, user.Password)
+	if err != nil {
+		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == error2.UniqueViolationErr {
+			return error2.ErrUserAlreadyExists
+		} else {
+			return error2.ErrUnknown
+		}
 	}
 
 	return nil
@@ -58,9 +84,14 @@ func (r repository) Insert(ctx context.Context, user user22.User) error {
 
 func (r repository) Delete(ctx context.Context, user user22.User) error {
 	query := "DELETE FROM users WHERE id = $1"
-	_, err := r.db.Exec(query, user.Id)
+
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
+	}
+	_, err = stmt.ExecContext(ctx, query, user.Id)
+	if err != nil {
+		return error2.ErrUnknown
 	}
 	return nil
 }

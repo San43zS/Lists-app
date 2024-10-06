@@ -6,7 +6,7 @@ import (
 )
 
 type User interface {
-	Verify(ctx context.Context, user user22.User) (bool, error)
+	Verify(ctx context.Context, user user22.User) error
 	Insert(ctx context.Context, user user22.User) error
 	GetById(ctx context.Context, Id int) (user22.User, error)
 	Delete(ctx context.Context, user user22.User) error

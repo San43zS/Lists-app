@@ -19,7 +19,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	if _, err := h.services.User().Verify(context.Background(), user); err != nil {
+	if err := h.services.User().Verify(context.Background(), user); err != nil {
 		c.JSONP(http.StatusBadRequest, "Error verifying user: "+err.Error())
 		return
 	}
