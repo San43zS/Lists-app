@@ -2,7 +2,7 @@ package app
 
 import (
 	"Lists-app/internal/handler"
-	"Lists-app/internal/server"
+	"Lists-app/internal/server/http"
 	"Lists-app/internal/service"
 	"Lists-app/internal/storage/config"
 	"Lists-app/internal/storage/db/psql"
@@ -10,7 +10,7 @@ import (
 )
 
 type App struct {
-	server *server.Server
+	server *http.Server
 }
 
 func New() (App, error) {
@@ -25,7 +25,7 @@ func New() (App, error) {
 
 	handlers := handler.New(srv)
 	app := App{
-		server: server.New(handlers.InitRoutes()),
+		server: http.New(handlers.InitRoutes()),
 	}
 	return app, nil
 }

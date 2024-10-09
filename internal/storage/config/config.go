@@ -20,16 +20,16 @@ type dbParams struct {
 
 func getDBParams() *dbParams {
 	return &dbParams{
-		host:     viper.GetString("HOST"),
-		port:     viper.GetString("PORT"),
-		user:     viper.GetString("USER"),
-		password: viper.GetString("PASSWORD"),
-		dbname:   viper.GetString("DBNAME"),
+		host:     viper.GetString("DB.HOST"),
+		port:     viper.GetString("DB.PORT"),
+		user:     viper.GetString("DB.USER"),
+		password: viper.GetString("DB.PASSWORD"),
+		dbname:   viper.GetString("DB.DBNAME"),
 	}
 }
 
 func (db dbParams) ParseURL() string {
-	template := viper.GetString("URLTEMPLATE")
+	template := viper.GetString("DB.URLTEMPLATE")
 
 	return fmt.Sprintf(template, db.host, db.port, db.dbname, db.user, db.password)
 }
@@ -39,6 +39,6 @@ func NewConfig() *Config {
 
 	return &Config{
 		URL:    test.ParseURL(),
-		Driver: viper.GetString("DRIVER"),
+		Driver: viper.GetString("DB.DRIVER"),
 	}
 }
