@@ -6,9 +6,9 @@ import (
 )
 
 type Notification interface {
-	GetNotificationByUserId(ctx context.Context, Id int) (notification.Notification, error)
-	GetAllNotificationsTTLoff(ctx context.Context) ([]notification.Notification, error)
-	AddNotification(ctx context.Context, notification notification.Notification) error
-	GetAllNotificationsTTLon(ctx context.Context) ([]notification.Notification, error)
-	DeleteNotification(ctx context.Context, notification notification.Notification) error
+	GetByUserId(ctx context.Context, Id int) (notification.Notification, error)
+	GetList(ctx context.Context) ([]notification.Notification, error)
+	Add(ctx context.Context, notification notification.Notification) error
+	GetListWithTTL(ctx context.Context) ([]notification.Notification, error)
+	Delete(ctx context.Context, notification notification.Notification) error
 }

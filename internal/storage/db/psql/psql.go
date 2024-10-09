@@ -17,16 +17,11 @@ type Store struct {
 }
 
 func New(config *config.Config) (storage.Storage, error) {
-	test := config.Driver
-	db, err := sqlx.Open(test, config.URL)
-
+	db, err := sqlx.Connect(config.Driver, config.URL)
 	if err != nil {
 		return nil, err
 	}
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	return &Store{
 		user:         user.New(db),
 		notification: notification2.New(db),

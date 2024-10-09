@@ -7,7 +7,7 @@ const (
 )
 
 var (
-	ErrUserAlreadyExists = errors.New("user already exists")
+	UserAlreadyExistsErr = errors.New("user already exists")
 
 	ErrUserNotFound = errors.New("user not found")
 	ErrUnknown      = errors.New("something went wrong")

@@ -1,9 +1,11 @@
 package main
 
 import (
-	"Lists-app/internal/app"
-	"github.com/spf13/viper"
 	"log"
+
+	"Lists-app/internal/app"
+
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -14,7 +16,6 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal(err)
 	}
-	//viper.AutomaticEnv()
 }
 
 func main() {

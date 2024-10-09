@@ -17,22 +17,22 @@ func New(storage notification3.Notification) notification3.Notification {
 	}
 }
 
-func (s service) GetNotificationByUserId(ctx context.Context, Id int) (notification2.Notification, error) {
-	return s.storage.GetNotificationByUserId(ctx, Id)
+func (s service) GetByUserId(ctx context.Context, Id int) (notification2.Notification, error) {
+	return s.storage.GetByUserId(ctx, Id)
 }
 
-func (s service) GetAllNotificationsTTLoff(ctx context.Context) ([]notification2.Notification, error) {
-	return s.storage.GetAllNotificationsTTLoff(ctx)
+func (s service) GetList(ctx context.Context) ([]notification2.Notification, error) {
+	return s.storage.GetList(ctx)
 }
 
-func (s service) AddNotification(ctx context.Context, notification notification2.Notification) error {
-	return s.storage.AddNotification(ctx, notification)
+func (s service) Add(ctx context.Context, notification notification2.Notification) error {
+	return s.storage.Add(ctx, notification)
 }
 
-func (s service) GetAllNotificationsTTLon(ctx context.Context) ([]notification2.Notification, error) {
-	return s.storage.GetAllNotificationsTTLon(ctx)
+func (s service) GetListWithTTL(ctx context.Context) ([]notification2.Notification, error) {
+	return s.storage.GetListWithTTL(ctx)
 }
 
-func (s service) DeleteNotification(ctx context.Context, notification notification2.Notification) error {
-	return s.storage.DeleteNotification(ctx, notification)
+func (s service) Delete(ctx context.Context, notification notification2.Notification) error {
+	return s.storage.Delete(ctx, notification)
 }

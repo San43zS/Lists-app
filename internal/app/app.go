@@ -9,29 +9,31 @@ import (
 	"context"
 )
 
-type app struct {
+type App struct {
 	server *server.Server
 }
 
-func New() (*app, error) {
+func New() (App, error) {
 	test := config.NewConfig()
+
 	storage, err := psql.New(test)
 	if err != nil {
-		return nil, err
+		return App{}, err
 	}
 
-	services := service.New(storage)
-	handlers := handler.New(services)
-	app := &app{
+	srv := service.New(storage)
+
+	handlers := handler.New(srv)
+	app := App{
 		server: server.New(handlers.InitRoutes()),
 	}
 	return app, nil
 }
 
-func (a *app) Run() error {
+func (a *App) Run() error {
 	return a.server.Run()
 }
 
-func (a *app) Shutdown(ctx context.Context) error {
+func (a *App) Shutdown(ctx context.Context) error {
 	return a.server.Shutdown(ctx)
 }
