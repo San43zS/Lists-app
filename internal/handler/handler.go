@@ -14,7 +14,7 @@ type Handler struct {
 func New(services service.Service) *Handler {
 	return &Handler{
 		services: services,
-		EndPoint: msgHandler.New(services),
+		EndPoint: msgHandler.,
 	}
 }
 
