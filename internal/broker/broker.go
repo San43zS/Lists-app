@@ -1,16 +1,16 @@
 package broker
 
 import (
-	"Lists-app/internal/broker/rabbitMQ"
+	"Lists-app/internal/broker/rabbit"
 	"fmt"
 )
 
 type Broker struct {
-	RabbitMQ rabbitMQ.Service
+	RabbitMQ rabbit.Service
 }
 
 func New() (Broker, error) {
-	rabbitMQ, err := rabbitMQ.New()
+	rabbitMQ, err := rabbit.New()
 	if err != nil {
 		return Broker{}, fmt.Errorf("failed to create RabbitMQ broker: %w", err)
 	}

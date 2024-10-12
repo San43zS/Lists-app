@@ -6,7 +6,7 @@ import (
 )
 
 type Consumer interface {
-	Consumer(ctx context.Context) ([]byte, error)
+	Consume(ctx context.Context) ([]byte, error)
 	Close() error
 }
 
@@ -20,7 +20,7 @@ func New(dial *amqp.Channel) Consumer {
 	}
 }
 
-func (c consumer) Consumer(ctx context.Context) ([]byte, error) {
+func (c consumer) Consume(ctx context.Context) ([]byte, error) {
 
 	return nil, nil
 }

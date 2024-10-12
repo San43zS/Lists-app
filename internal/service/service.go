@@ -8,10 +8,6 @@ import (
 	"Lists-app/internal/storage"
 )
 
-const (
-	uniqueViolationErr = "23505"
-)
-
 type Service interface {
 	User() user.User
 	Notification() notification.Notification

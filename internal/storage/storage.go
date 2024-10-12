@@ -1,11 +1,11 @@
 package storage
 
 import (
-	"Lists-app/internal/broker/rabbitMQ/api/notification"
-	user22 "Lists-app/internal/storage/api/user"
+	"Lists-app/internal/broker/rabbit/api/notification"
+	"Lists-app/internal/storage/api/user"
 )
 
 type Storage interface {
-	User() user22.User
+	User() user.User
 	Notification() notification.Notification
 }

@@ -1,9 +1,9 @@
-package rabbitMQ
+package rabbit
 
 import (
-	"Lists-app/internal/broker/rabbitMQ/config"
-	"Lists-app/internal/broker/rabbitMQ/consumer"
-	"Lists-app/internal/broker/rabbitMQ/producer"
+	"Lists-app/internal/broker/rabbit/config"
+	"Lists-app/internal/broker/rabbit/consumer"
+	"Lists-app/internal/broker/rabbit/producer"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -11,8 +11,8 @@ import (
 )
 
 type Service interface {
-	Produce() producer.Producer
-	Consume() consumer.Consumer
+	Producer() producer.Producer
+	Consumer() consumer.Consumer
 }
 
 type service struct {
@@ -30,9 +30,8 @@ func New() (Service, error) {
 
 	ch, err := conn.Channel()
 	if err != nil {
-
-		ch.Close()
 		conn.Close()
+
 		return nil, err
 	}
 
@@ -51,14 +50,18 @@ func New() (Service, error) {
 		return nil, err
 	}
 
-	return &service{dial: ch}, nil
+	srv := &service{dial: ch}
+
+	srv.Producer().Produce()
+
+	return srv, nil
 }
 
-func (s service) Produce() producer.Producer {
+func (s service) Producer() producer.Producer {
 	return producer.New(s.dial)
 }
 
-func (s service) Consume() consumer.Consumer {
+func (s service) Consumer() consumer.Consumer {
 	return consumer.New(s.dial)
 }
 

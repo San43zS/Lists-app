@@ -55,7 +55,12 @@ func (r repository) Verify(ctx context.Context, user user22.User) error {
 		return err
 	}
 
-	err = stmt.QueryRowContext(ctx, user.Email, user.Password, user.Username).Scan(
+	err = stmt.QueryRowContext(
+		ctx,
+		user.Email,
+		user.Password,
+		user.Username,
+	).Scan(
 		&existingUser.Id,
 		&existingUser.Email,
 		&existingUser.Username,
@@ -84,11 +89,13 @@ func (r repository) Insert(ctx context.Context, user user22.User) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = stmt.ExecContext(ctx, query, user.Email, user.Username, user.Password)
 	if err != nil {
 		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == error2.UniqueViolationErr {
 			return error2.UserAlreadyExistsErr
 		}
+
 		return error2.ErrUnknown
 	}
 
@@ -102,9 +109,11 @@ func (r repository) Delete(ctx context.Context, user user22.User) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = stmt.ExecContext(ctx, query, user.Id)
 	if err != nil {
 		return error2.ErrUnknown
 	}
+
 	return nil
 }

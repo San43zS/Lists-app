@@ -7,7 +7,7 @@ import (
 )
 
 type Producer interface {
-	Producer(ctx context.Context, arr []byte) error
+	Produce(ctx context.Context, arr []byte) error
 	Close() error
 }
 
@@ -21,7 +21,7 @@ func New(dial *amqp.Channel) Producer {
 	}
 }
 
-func (p producer) Producer(ctx context.Context, arr []byte) error {
+func (p producer) Produce(ctx context.Context, arr []byte) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -39,6 +39,7 @@ func (p producer) Producer(ctx context.Context, arr []byte) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

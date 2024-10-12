@@ -1,7 +1,7 @@
 package psql
 
 import (
-	"Lists-app/internal/broker/rabbitMQ/api/notification"
+	"Lists-app/internal/broker/rabbit/api/notification"
 	"Lists-app/internal/storage"
 	user2 "Lists-app/internal/storage/api/user"
 	"Lists-app/internal/storage/config"
