@@ -1,1 +1,5 @@
 package rabbit
+
+func xz() {
+
+}
