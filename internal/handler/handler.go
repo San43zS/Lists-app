@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
+		api.POST("/test", h.test)
 		api.POST("/", h.viewAllNotify)
 		api.PUT("/:id", h.createNotify)
 		api.DELETE("/:id", h.deleteNotify)

@@ -1,9 +1,9 @@
 package notification
 
 import (
+	"Lists-app/internal/broker/rabbitMQ/api/notification"
 	notification2 "Lists-app/internal/model/notification"
 	notification3 "Lists-app/internal/service/api/notification"
-	"Lists-app/internal/storage/api/notification"
 	"context"
 )
 

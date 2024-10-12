@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"Lists-app/internal/storage/api/notification"
+	"Lists-app/internal/broker/rabbitMQ/api/notification"
 	user22 "Lists-app/internal/storage/api/user"
 )
 

@@ -1,8 +1,8 @@
 package notification
 
 import (
+	notification2 "Lists-app/internal/broker/rabbitMQ/api/notification"
 	notification3 "Lists-app/internal/model/notification"
-	notification2 "Lists-app/internal/storage/api/notification"
 	"context"
 	"github.com/jmoiron/sqlx"
 )
