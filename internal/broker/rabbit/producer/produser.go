@@ -8,7 +8,6 @@ import (
 
 type Producer interface {
 	Produce(ctx context.Context, arr []byte) error
-	Close() error
 }
 
 type producer struct {
@@ -40,10 +39,5 @@ func (p producer) Produce(ctx context.Context, arr []byte) error {
 		return err
 	}
 
-	return nil
-}
-
-func (p producer) Close() error {
-	p.dial.Close()
 	return nil
 }
