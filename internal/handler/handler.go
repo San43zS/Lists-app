@@ -2,15 +2,25 @@ package handler
 
 import (
 	"Lists-app/internal/service"
+	"Lists-app/pkg/msgHandler"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
+	EndPoint msgHandler.MsgHandler
 	services service.Service
 }
 
 func New(services service.Service) *Handler {
-	return &Handler{services: services}
+	return &Handler{
+		services: services,
+		EndPoint: msgHandler.New(services),
+	}
+}
+
+type MSG struct {
+	endpoint string
+	body     []byte
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
