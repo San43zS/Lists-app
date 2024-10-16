@@ -1,17 +1,20 @@
 package rabbit
 
-import amqp "github.com/rabbitmq/amqp091-go"
+import (
+	"Lists-app/internal/broker/rabbit/config"
+	amqp "github.com/rabbitmq/amqp091-go"
+)
 
 func Configure(ch *amqp.Channel) error {
 
 	err := ch.ExchangeDeclare(
-		"test",   // name
-		"direct", // type
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
+		config.ExchangeName, // name
+		config.ExchangeType, // type
+		true,                // durable
+		false,               // auto-deleted
+		false,               // internal
+		false,               // no-wait
+		nil,                 // arguments
 	)
 
 	if err != nil {
@@ -19,12 +22,12 @@ func Configure(ch *amqp.Channel) error {
 	}
 
 	q, err := ch.QueueDeclare(
-		"yellow", // name
-		false,    // durable
-		false,    // delete when unused
-		true,     // exclusive
-		false,    // no-wait
-		nil,      // arguments
+		config.QueueName, // name
+		false,            // durable
+		false,            // delete when unused
+		true,             // exclusive
+		false,            // no-wait
+		nil,              // arguments
 	)
 
 	if err != nil {
@@ -32,9 +35,9 @@ func Configure(ch *amqp.Channel) error {
 	}
 
 	err = ch.QueueBind(
-		q.Name,   // name
-		"yellow", // key
-		"test",   // exchange
+		q.Name,              // name
+		config.QueueName,    // key
+		config.ExchangeName, // exchange
 		false,
 		nil,
 	)

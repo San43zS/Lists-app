@@ -50,21 +50,21 @@ func (s server) serve(ctx context.Context, consumer consumer) error {
 
 	for {
 		if err := ctx.Err(); err != nil {
-			fmt.Println("failed to consume message [%s]: %v", consumer.topic, err)
+			fmt.Printf("failed to consume message [%s]: %v\n", consumer.topic, err)
 			return nil
 		}
 
 		m, err := c.Consume(ctx)
 
 		if err != nil {
-			fmt.Println("failed to consume message [%s]: %v", consumer.topic, err)
+			fmt.Printf("failed to consume message [%s]: %v\n", consumer.topic, err)
 			continue
 		}
 
 		go func() {
 			err := s.handler.ServeMSG(ctx, m)
 			if err != nil {
-				fmt.Println("failed to process message [%s]: %v", consumer.topic, err)
+				fmt.Printf("failed to process message [%s]: %v\n", consumer.topic, err)
 
 				return
 			}

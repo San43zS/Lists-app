@@ -1,7 +1,11 @@
 package server
 
 import (
+	"Lists-app/internal/handler"
 	"context"
+	"golang.org/x/sync/errgroup"
+	"log"
+	"sync"
 
 	"Lists-app/internal/broker"
 	"Lists-app/internal/server/launcher"
@@ -18,15 +22,19 @@ type server struct {
 }
 
 func New(srv service.Service) (launcher.Server, error) {
-	broker, err := broker.New()
+	bkr, err := broker.New()
 	if err != nil {
+
 		return nil, err
 	}
 
+	h := handler.New(srv, bkr)
+	hHttp := h.Http
+
 	server := &server{
 		servers: []launcher.Server{
-			rabbit.New(broker.RabbitMQ, srv),
-			http.New(),
+			rabbit.New(bkr.RabbitMQ, h.EndPoint),
+			http.New(hHttp.InitRoutes()),
 		},
 	}
 
@@ -34,9 +42,41 @@ func New(srv service.Service) (launcher.Server, error) {
 }
 
 func (s *server) Serve(ctx context.Context) error {
-	return nil
+	gr, grCtx := errgroup.WithContext(ctx)
+
+	// start server
+	gr.Go(func() error {
+		return s.serve(grCtx)
+	})
+
+	var err error
+
+	if err = gr.Wait(); err != nil {
+		log.Println("server stopped with error: ", err)
+	}
+
+	log.Println("app: shutting down the server")
+
+	return err
 }
 
 func (s *server) serve(ctx context.Context) error {
-	return nil
+	var wg sync.WaitGroup
+	wg.Add(len(s.servers))
+
+	gr, grCtx := errgroup.WithContext(ctx)
+
+	for _, s := range s.servers {
+		s := s
+
+		gr.Go(func() error {
+			defer wg.Done()
+
+			return s.Serve(grCtx)
+		})
+	}
+
+	wg.Wait()
+
+	return gr.Wait()
 }

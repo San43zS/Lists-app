@@ -17,3 +17,6 @@ AMQP:
 
   DRIVER: "amqp"
   URLTEMPLATE: "://%s:%s@%s:%s/"
+
+
+

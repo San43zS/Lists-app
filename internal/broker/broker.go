@@ -12,6 +12,7 @@ type Broker struct {
 func New() (Broker, error) {
 	rabbitMQ, err := rabbit.New()
 	if err != nil {
+
 		return Broker{}, fmt.Errorf("failed to create RabbitMQ broker: %w", err)
 	}
 
