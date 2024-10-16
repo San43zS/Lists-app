@@ -1,7 +1,7 @@
-package handler
+package http
 
 import (
-	httpServError "Lists-app/internal/handler/model/error"
+	httpServError "Lists-app/internal/handler/error"
 	user2 "Lists-app/internal/model/user"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func (h *Handler) signIn(c *gin.Context) {
+func (h *handler) SignIn(c *gin.Context) {
 	var user user2.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -21,7 +21,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.User().Verify(context.Background(), user); err != nil {
+	if err := h.srv.User().Verify(context.Background(), user); err != nil {
 
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
@@ -31,7 +31,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 }
 
-func (h *Handler) signUp(c *gin.Context) {
+func (h *handler) SignUp(c *gin.Context) {
 	var user user2.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -39,7 +39,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.User().Insert(context.Background(), user); err != nil {
+	if err := h.srv.User().Insert(context.Background(), user); err != nil {
 
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
@@ -48,7 +48,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	c.JSONP(http.StatusOK, "User successfully registered")
 }
 
-func (h *Handler) signOut(c *gin.Context) {
+func (h *handler) SignOut(c *gin.Context) {
 	var user user2.User
 
 	if err := c.BindJSON(&user); err != nil {
@@ -56,7 +56,7 @@ func (h *Handler) signOut(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.User().Delete(context.Background(), user); err != nil {
+	if err := h.srv.User().Delete(context.Background(), user); err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}

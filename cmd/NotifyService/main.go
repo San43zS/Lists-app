@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"Lists-app/internal/app"
@@ -24,7 +25,7 @@ func main() {
 		log.Fatalf("error occured while creating server: %v", err)
 	}
 
-	if err := server.Run(); err != nil {
+	if err := server.Start(context.Background()); err != nil {
 		log.Fatalf("error occured while running http server: %v", err)
 	}
 }

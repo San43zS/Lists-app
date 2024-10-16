@@ -1,13 +1,13 @@
 package consumer
 
 import (
+	"Lists-app/internal/broker/rabbit/config"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Consumer interface {
 	Consume(ctx context.Context) ([]byte, error)
-	Close() error
 }
 
 type consumer struct {
@@ -21,10 +21,27 @@ func New(dial *amqp.Channel) Consumer {
 }
 
 func (c consumer) Consume(ctx context.Context) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), config.ContextTimeOut)
+	defer cancel()
+
+	msgs, err := c.dial.Consume(
+		config.QueueName, // queue
+		"",               // consumer
+		true,             // auto-ack
+		false,            // exclusive
+		false,            // no-local
+		false,            // no-wait
+		nil,              // args
+	)
+	if err != nil {
+
+		return nil, err
+	}
+
+	for msg := range msgs {
+
+		return msg.Body, nil
+	}
 
 	return nil, nil
-}
-
-func (c consumer) Close() error {
-	return nil
 }

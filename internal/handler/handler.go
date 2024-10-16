@@ -1,35 +1,22 @@
 package handler
 
 import (
+	"Lists-app/internal/broker"
+	"Lists-app/internal/handler/endPoint"
+	"Lists-app/internal/handler/http"
 	"Lists-app/internal/service"
-	"github.com/gin-gonic/gin"
+	"Lists-app/pkg/msgHandler"
 )
 
 type Handler struct {
+	EndPoint msgHandler.MsgHandler
 	services service.Service
+	Http     http.Handler
 }
 
-func New(services service.Service) *Handler {
-	return &Handler{services: services}
-}
-
-func (h *Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
-
-	// Endpoints fo registration & authorization
-	auth := router.Group("/auth")
-	{
-		auth.POST("/sign-up", h.signUp)
-		auth.POST("/sign-in", h.signIn)
-		auth.POST("/sign-out", h.signOut)
+func New(services service.Service, broker broker.Broker) *Handler {
+	return &Handler{
+		EndPoint: endPoint.New(services),
+		Http:     http.New(services),
 	}
-
-	api := router.Group("/api")
-	{
-		api.POST("/test", h.test)
-		api.POST("/", h.viewAllNotify)
-		api.PUT("/:id", h.createNotify)
-		api.DELETE("/:id", h.deleteNotify)
-	}
-	return router
 }

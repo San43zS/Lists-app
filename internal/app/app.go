@@ -1,39 +1,49 @@
 package app
 
 import (
-	"Lists-app/internal/handler"
-	"Lists-app/internal/server/http"
+	"Lists-app/internal/server"
 	"Lists-app/internal/service"
 	"Lists-app/internal/storage/config"
 	"Lists-app/internal/storage/db/psql"
 	"context"
+	"fmt"
+	"log"
 )
 
 type App struct {
-	server *http.Server
+	server service.Service
 }
 
-func New() (App, error) {
+func New() (*App, error) {
 	test := config.NewConfig()
 
 	storage, err := psql.New(test)
 	if err != nil {
-		return App{}, err
+
+		return &App{}, err
 	}
 
 	srv := service.New(storage)
 
-	handlers := handler.New(srv)
-	app := App{
-		server: http.New(handlers.InitRoutes()),
+	app := &App{
+		server: srv,
 	}
+
 	return app, nil
 }
 
-func (a *App) Run() error {
-	return a.server.Run()
-}
+func (a *App) Start(ctx context.Context) error {
+	srv, err := server.New(a.server)
+	if err != nil {
 
-func (a *App) Shutdown(ctx context.Context) error {
-	return a.server.Shutdown(ctx)
+		return err
+	}
+
+	if err := srv.Serve(ctx); err != nil {
+
+		return fmt.Errorf("server stopped with error: %w\n", err)
+	}
+
+	log.Println("server stopped")
+	return nil
 }

@@ -3,6 +3,14 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"time"
+)
+
+const (
+	QueueName      = "yellow"
+	ExchangeName   = "test"
+	ExchangeType   = "direct"
+	ContextTimeOut = 5 * time.Second
 )
 
 type Config struct {

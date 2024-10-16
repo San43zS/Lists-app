@@ -1,26 +1,26 @@
-package handler
+package endPoint
 
 import (
-	httpServError "Lists-app/internal/handler/model/error"
+	httpServError "Lists-app/internal/handler/error"
 	"Lists-app/internal/model/notification"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func (h *Handler) viewAllNotify(c *gin.Context) {
+func (h *handler) viewAllNotify(c *gin.Context) {
 
 }
 
-func (h *Handler) createNotify(c *gin.Context) {
+func (h *handler) createNotify(c *gin.Context) {
 
 }
 
-func (h *Handler) deleteNotify(c *gin.Context) {
+func (h *handler) deleteNotify(c *gin.Context) {
 
 }
 
-func (h *Handler) test(c *gin.Context) {
+func (h *handler) test(c *gin.Context) {
 	var notify notification.Notification
 
 	if err := c.BindJSON(&notify); err != nil {
@@ -29,7 +29,7 @@ func (h *Handler) test(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Notification().Add(context.Background(), notify); err != nil {
+	if err := h.srv.Notification().Add(context.Background(), notify); err != nil {
 
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return

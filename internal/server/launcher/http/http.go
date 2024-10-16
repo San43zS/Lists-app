@@ -1,18 +1,19 @@
 package http
 
 import (
+	"Lists-app/internal/server/launcher"
 	"context"
-	"fmt"
+	"errors"
 	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
 
-type Server struct {
-	httpServer *http.Server
+type server struct {
+	srv *http.Server
 }
 
-func New(handler http.Handler) *Server {
+func New(handler http.Handler) launcher.Server {
 	var httpServer = &http.Server{
 		Addr:    "localhost" + ":" + viper.GetString("http_port"),
 		Handler: handler,
@@ -23,15 +24,22 @@ func New(handler http.Handler) *Server {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-	return &Server{httpServer: httpServer}
+	return &server{
+		srv: httpServer,
+	}
 }
 
-func (s Server) Run() error {
-	fmt.Printf("Сервер запущен на адресе: http://%s\n", s.httpServer.Addr)
-	return s.httpServer.ListenAndServe()
-}
-
-// ctx - is a contex of the running server
-func (s Server) Shutdown(ctx context.Context) error {
-	return s.httpServer.Shutdown(ctx)
+func (s *server) Serve(ctx context.Context) error {
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil {
+			if errors.Is(err, http.ErrServerClosed) {
+				return
+			}
+		}
+	}()
+	<-ctx.Done()
+	if err := s.srv.Shutdown(ctx); err != nil {
+		return err
+	}
+	return nil
 }
