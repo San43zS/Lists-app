@@ -15,8 +15,8 @@ func NewModel() Model {
 	model := Model{}
 
 	model.consumers = append(model.consumers, consumer{
-		topic: config.QueueName,
-		ID:    config.QueueName,
+		topic: config.ProducerQueueName,
+		ID:    config.ProducerQueueName,
 	})
 
 	return model

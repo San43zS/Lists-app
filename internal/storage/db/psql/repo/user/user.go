@@ -4,20 +4,25 @@ import (
 	error2 "Lists-app/internal/model/error"
 	user22 "Lists-app/internal/model/user"
 	user2 "Lists-app/internal/storage/api/user"
+	"Lists-app/internal/storage/config"
+	"Lists-app/pkg/encrypt"
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
 type repository struct {
-	db *sqlx.DB
+	db      *sqlx.DB
+	encrypt encrypt.Service
 }
 
-func New(db *sqlx.DB) user2.User {
+func New(db *sqlx.DB, encrypt encrypt.Service) user2.User {
 	return repository{
-		db: db,
+		db:      db,
+		encrypt: encrypt,
 	}
 }
 
@@ -28,7 +33,7 @@ func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return user22.User{}, err
+		return user22.User{}, fmt.Errorf("failed to prepare query: %w", err)
 	}
 
 	err = stmt.QueryRowContext(ctx, Id).Scan(
@@ -39,27 +44,26 @@ func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
 	)
 
 	if err != nil {
-		return user22.User{}, err
+		return user22.User{}, fmt.Errorf("failed to query row: %w", err)
 	}
 
 	return existingUser, nil
 }
 
-func (r repository) Verify(ctx context.Context, user user22.User) error {
+func (r repository) SignIn(ctx context.Context, user user22.User) error {
 	var existingUser user22.User
 
-	query := `SELECT * FROM users WHERE email = $1 AND password = $2 AND username = $3`
+	query := `SELECT * FROM users WHERE email = $1 AND password = $2`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to prepare query: %w", err)
 	}
 
 	err = stmt.QueryRowContext(
 		ctx,
 		user.Email,
 		user.Password,
-		user.Username,
 	).Scan(
 		&existingUser.Id,
 		&existingUser.Email,
@@ -75,24 +79,30 @@ func (r repository) Verify(ctx context.Context, user user22.User) error {
 		return error2.ErrUnknown
 	}
 
-	if user.Email != existingUser.Email || user.Username != existingUser.Username || user.Password != existingUser.Password {
-		return error2.ErrVerifyUser
+	if user.Email != existingUser.Email {
+		return error2.ErrWrongEmail
+	}
+
+	if r.encrypt.Password(user.Password) != existingUser.Password {
+		return error2.ErrWrongPassword
 	}
 
 	return nil
 }
 
-func (r repository) Insert(ctx context.Context, user user22.User) error {
+func (r repository) SignUp(ctx context.Context, user user22.User) error {
+	user.Password = r.encrypt.Password(user.Password)
 	query := "INSERT INTO users (email, username, password) VALUES ($1, $2, $3)"
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to prepare query: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, query, user.Email, user.Username, user.Password)
+	_, err = stmt.ExecContext(ctx, user.Email, user.Username, user.Password)
 	if err != nil {
-		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == error2.UniqueViolationErr {
+		var pgErr *pq.Error
+		if errors.As(err, &pgErr) && string(pgErr.Code) == config.GetUniqueViolationErr() {
 			return error2.UserAlreadyExistsErr
 		}
 
@@ -107,10 +117,10 @@ func (r repository) Delete(ctx context.Context, user user22.User) error {
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to prepare query: %w", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, query, user.Id)
+	_, err = stmt.ExecContext(ctx, user.Id)
 	if err != nil {
 		return error2.ErrUnknown
 	}

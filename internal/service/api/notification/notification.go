@@ -1,17 +1,14 @@
 package notification
 
 import (
-	"Lists-app/internal/model/notification"
+	msg2 "Lists-app/internal/handler/model/msg"
 	"context"
 )
 
 type Notification interface {
-	GetByUserId(ctx context.Context, Id int) (notification.Notification, error)
+	Add(ctx context.Context, msg msg2.MSG) error
 
-	GetList(ctx context.Context) ([]notification.Notification, error)
-	GetListWithTTL(ctx context.Context) ([]notification.Notification, error)
+	GetOld(ctx context.Context) ([]byte, error)
 
-	Add(ctx context.Context, notification notification.Notification) error
-
-	Delete(ctx context.Context, notification notification.Notification) error
+	GetCurrent(ctx context.Context) ([]byte, error)
 }

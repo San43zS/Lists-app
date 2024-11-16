@@ -13,62 +13,53 @@ import (
 type server struct {
 	handler msgHandler.MsgHandler
 	broker  rabbit.Service
-	model   Model
 }
 
 func New(broker rabbit.Service, handler msgHandler.MsgHandler) launcher.Server {
-
 	return &server{
 		handler: handler,
 		broker:  broker,
-		model:   NewModel(),
 	}
 }
 
 func (s server) Serve(ctx context.Context) error {
 	var wg sync.WaitGroup
-	wg.Add(len(s.model.consumers))
+	wg.Add(1)
 
 	gr, grCtx := errgroup.WithContext(ctx)
 
-	for _, consumer := range s.model.consumers {
-		consumer := consumer
-
-		gr.Go(func() error {
-			defer wg.Done()
-			return s.serve(grCtx, consumer)
-		})
-	}
+	gr.Go(func() error {
+		defer wg.Done()
+		return s.serve(grCtx)
+	})
 
 	wg.Wait()
 
 	return nil
 }
 
-func (s server) serve(ctx context.Context, consumer consumer) error {
+func (s server) serve(ctx context.Context) error {
 	c := s.broker.Consumer()
 
 	for {
 		if err := ctx.Err(); err != nil {
-			fmt.Printf("failed to consume message [%s]: %v\n", consumer.topic, err)
-			return nil
+			return fmt.Errorf("rabbit listener stopped error: %v", err)
 		}
 
-		m, err := c.Consume(ctx)
-
+		_, err := c.Consume(ctx)
 		if err != nil {
-			fmt.Printf("failed to consume message [%s]: %v\n", consumer.topic, err)
+			//fmt.Println(m)
+			// TODO: add logger
+			//log.Errorf("failed to consume message error: %v", err)
 			continue
 		}
-
-		go func() {
-			err := s.handler.ServeMSG(ctx, m)
-			if err != nil {
-				fmt.Printf("failed to process message [%s]: %v\n", consumer.topic, err)
-
-				return
-			}
-		}()
-
+		//
+		//go func() {
+		//	_, err := s.handler.ServeMSG(ctx, m)
+		//	if err != nil {
+		//		fmt.Errorf("failed to handle message: %v", err)
+		//		return
+		//	}
+		//}()
 	}
 }

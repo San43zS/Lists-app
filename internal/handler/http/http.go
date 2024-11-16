@@ -3,31 +3,36 @@ package http
 import (
 	"Lists-app/internal/service"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
-
-type Handler interface {
-	InitRoutes() *gin.Engine
-}
 
 type handler struct {
 	srv service.Service
 }
 
-func New(service service.Service) Handler {
-	return &handler{
+func New(service service.Service) http.Handler {
+	handler := handler{
 		srv: service,
 	}
+
+	return handler.InitRoutes()
 }
 
-func (h *handler) InitRoutes() *gin.Engine {
+func (h handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	// Endpoints fo registration & authorization
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.SignUp)
 		auth.POST("/sign-in", h.SignIn)
 		auth.POST("/sign-out", h.SignOut)
+	}
+
+	ws := router.Group("/ws")
+	{
+		ws.POST("/add", h.AddNotify)
+		ws.GET("/get-current-notify", h.GetCurrentNotify)
+		ws.GET("/get-old-notify", h.GetOldNotify)
 	}
 
 	return router

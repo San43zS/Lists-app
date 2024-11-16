@@ -4,6 +4,7 @@ import (
 	"Lists-app/internal/broker/rabbit/config"
 	"Lists-app/internal/broker/rabbit/consumer"
 	"Lists-app/internal/broker/rabbit/producer"
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -22,18 +23,27 @@ func New() (Service, error) {
 	conn, err := amqp.Dial(cfg.Driver + cfg.URL)
 	if err != nil {
 		conn.Close()
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
 		conn.Close()
+		return nil, fmt.Errorf("failed to open a channel: %w", err)
+	}
+
+	if err := ConfigureConsumer(ch); err != nil {
+		ch.Close()
+		conn.Close()
+
 		return nil, err
 	}
 
-	if err := Configure(ch); err != nil {
+	if err := ConfigureProducer(ch); err != nil {
 		ch.Close()
 		conn.Close()
+
+		return nil, err
 	}
 
 	srv := &service{dial: ch}

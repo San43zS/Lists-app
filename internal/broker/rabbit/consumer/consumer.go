@@ -3,6 +3,7 @@ package consumer
 import (
 	"Lists-app/internal/broker/rabbit/config"
 	"context"
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -21,25 +22,21 @@ func New(dial *amqp.Channel) Consumer {
 }
 
 func (c consumer) Consume(ctx context.Context) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), config.ContextTimeOut)
-	defer cancel()
 
 	msgs, err := c.dial.Consume(
-		config.QueueName, // queue
-		"",               // consumer
-		true,             // auto-ack
-		false,            // exclusive
-		false,            // no-local
-		false,            // no-wait
-		nil,              // args
+		config.ConsumerQueueName,   // queue
+		config.UserServiceConsumer, // consumer
+		false,                      // auto-ack
+		false,                      // exclusive
+		false,                      // no-local
+		true,                       // no-wait
+		nil,                        // args
 	)
 	if err != nil {
-
-		return nil, err
+		return nil, fmt.Errorf("failed to consume message: %w", err)
 	}
 
 	for msg := range msgs {
-
 		return msg.Body, nil
 	}
 

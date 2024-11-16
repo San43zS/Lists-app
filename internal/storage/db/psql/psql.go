@@ -1,19 +1,17 @@
 package psql
 
 import (
-	"Lists-app/internal/broker/rabbit/api/notification"
 	"Lists-app/internal/storage"
 	user2 "Lists-app/internal/storage/api/user"
 	"Lists-app/internal/storage/config"
-	notification2 "Lists-app/internal/storage/db/psql/repo/notification"
 	"Lists-app/internal/storage/db/psql/repo/user"
+	"Lists-app/pkg/encrypt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type Store struct {
-	user         user2.User
-	notification notification.Notification
+	user user2.User
 }
 
 func New(config *config.Config) (storage.Storage, error) {
@@ -23,15 +21,10 @@ func New(config *config.Config) (storage.Storage, error) {
 	}
 
 	return &Store{
-		user:         user.New(db),
-		notification: notification2.New(db),
+		user: user.New(db, encrypt.New()),
 	}, nil
 }
 
 func (s Store) User() user2.User {
 	return s.user
-}
-
-func (s Store) Notification() notification.Notification {
-	return s.notification
 }

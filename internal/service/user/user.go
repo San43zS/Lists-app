@@ -17,12 +17,12 @@ func New(storage user.User) user.User {
 	}
 }
 
-func (s service) Verify(ctx context.Context, user user2.User) error {
-	return s.storage.Verify(ctx, user)
+func (s service) SignIn(ctx context.Context, user user2.User) error {
+	return s.storage.SignIn(ctx, user)
 }
 
-func (s service) Insert(ctx context.Context, user user2.User) error {
-	return s.storage.Insert(ctx, user)
+func (s service) SignUp(ctx context.Context, user user2.User) error {
+	return s.storage.SignUp(ctx, user)
 }
 
 func (s service) GetById(ctx context.Context, Id int) (user2.User, error) {

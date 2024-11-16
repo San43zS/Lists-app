@@ -42,3 +42,7 @@ func NewConfig() *Config {
 		Driver: viper.GetString("DB.DRIVER"),
 	}
 }
+
+func GetUniqueViolationErr() string {
+	return viper.GetString("ERR.USER_ALREADY_EXISTS")
+}

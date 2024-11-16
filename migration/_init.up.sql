@@ -1,7 +1,7 @@
-create table users
+CREATE TABLE IF NOT EXISTS users
 (
     id       BIGSERIAL PRIMARY KEY,
-    email    varchar(255) not null unique,
-    username varchar(255) not null unique,
-    password varchar(255) not null
+    email    VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
 );

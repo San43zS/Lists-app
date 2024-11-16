@@ -8,27 +8,20 @@ import (
 	"net/http"
 )
 
-type Response struct {
-	Message string `json:"message"`
-}
-
 func (h *handler) SignIn(c *gin.Context) {
 	var user user2.User
 
 	if err := c.BindJSON(&user); err != nil {
-
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}
 
-	if err := h.srv.User().Verify(context.Background(), user); err != nil {
-
+	if err := h.srv.User().SignIn(context.Background(), user); err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, "You have successfully logged in to your account")
-
 }
 
 func (h *handler) SignUp(c *gin.Context) {
@@ -39,8 +32,7 @@ func (h *handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.srv.User().Insert(context.Background(), user); err != nil {
-
+	if err := h.srv.User().SignUp(context.Background(), user); err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}

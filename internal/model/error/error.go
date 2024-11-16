@@ -12,5 +12,6 @@ var (
 	ErrUserNotFound = errors.New("user not found")
 	ErrUnknown      = errors.New("something went wrong")
 
-	ErrVerifyUser = errors.New("email or password or username is incorrect")
+	ErrWrongEmail    = errors.New("email  is incorrect")
+	ErrWrongPassword = errors.New("wrong password")
 )

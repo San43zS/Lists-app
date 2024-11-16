@@ -3,6 +3,7 @@ package producer
 import (
 	"Lists-app/internal/broker/rabbit/config"
 	"context"
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -20,24 +21,23 @@ func New(dial *amqp.Channel) Producer {
 	}
 }
 
-func (p producer) Produce(ctx context.Context, arr []byte) error {
-	ctx, cancel := context.WithTimeout(context.Background(), config.ContextTimeOut)
-	defer cancel()
+func (p producer) Produce(ctx context.Context, msg []byte) error {
+	f := string(msg)
 
-	body := arr
-	err := p.dial.PublishWithContext(ctx,
-		config.ExchangeName, // exchange
-		config.QueueName,    // routing key
-		false,               // mandatory
-		false,               // immediate
+	err := p.dial.PublishWithContext(
+		ctx,
+		config.ProducerExchangeName, // exchange
+		config.ProducerRoutingKey,   // routing key
+		false,                       // mandatory
+		false,                       // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        body,
-		})
+			Body:        []byte(f),
+		},
+	)
 
 	if err != nil {
-
-		return err
+		return fmt.Errorf("failed to publish message: %w", err)
 	}
 
 	return nil

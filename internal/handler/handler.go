@@ -2,21 +2,24 @@ package handler
 
 import (
 	"Lists-app/internal/broker"
-	"Lists-app/internal/handler/endPoint"
+	"Lists-app/internal/handler/event"
 	"Lists-app/internal/handler/http"
 	"Lists-app/internal/service"
 	"Lists-app/pkg/msgHandler"
+	http2 "net/http"
 )
 
 type Handler struct {
 	EndPoint msgHandler.MsgHandler
 	services service.Service
-	Http     http.Handler
+	Http     http2.Handler
 }
 
 func New(services service.Service, broker broker.Broker) *Handler {
+	router := event.New(services)
 	return &Handler{
-		EndPoint: endPoint.New(services),
+		services: services,
+		EndPoint: router,
 		Http:     http.New(services),
 	}
 }

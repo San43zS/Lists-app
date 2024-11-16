@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Lists-app/internal/broker"
 	"Lists-app/internal/service/api/notification"
 	"Lists-app/internal/service/api/user"
 	notification2 "Lists-app/internal/service/notification"
@@ -19,11 +20,11 @@ type service struct {
 	notification notification.Notification
 }
 
-func New(repos storage.Storage) Service {
+func New(repos storage.Storage, broker broker.Broker) Service {
 	return &service{
 		storage:      repos,
 		user:         user2.New(repos.User()),
-		notification: notification2.New(repos.Notification()),
+		notification: notification2.New(broker),
 	}
 }
 

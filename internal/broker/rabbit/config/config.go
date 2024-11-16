@@ -7,10 +7,23 @@ import (
 )
 
 const (
-	QueueName      = "yellow"
-	ExchangeName   = "test"
-	ExchangeType   = "direct"
-	ContextTimeOut = 5 * time.Second
+	ProducerQueueName    = "yellowQueue"
+	ProducerExchangeName = "test"
+	ContextTimeOut       = 5 * time.Second
+)
+
+const (
+	ConsumerQueueName    = "greenQueue"
+	ConsumerExchangeName = "test"
+)
+
+const (
+	ProducerRoutingKey = "yellow"
+	ConsumerRoutingKey = "green"
+)
+
+const (
+	UserServiceConsumer = "UserServiceConsumer"
 )
 
 type Config struct {

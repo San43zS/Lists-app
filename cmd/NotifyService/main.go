@@ -17,15 +17,16 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func main() {
 	server, err := app.New()
 	if err != nil {
-		log.Fatalf("error occured while creating server: %v", err)
+		log.Fatalf("error occured while creating app: %v", err)
 	}
 
 	if err := server.Start(context.Background()); err != nil {
-		log.Fatalf("error occured while running http server: %v", err)
+		log.Fatalf("error occured while running server: %v", err)
 	}
 }

@@ -1,21 +1,40 @@
 package event
 
 import (
-	"Lists-app/internal/model/notification"
+	msg2 "Lists-app/internal/handler/model/msg"
 	"context"
+	"fmt"
+	"log"
 )
 
-func (h handler) AddNotify(ctx context.Context, msg []byte) error {
-	n := notification.Notification{
-		Id:        1,
-		Info:      "string(msg)",
-		TTL:       10,
-		CreatedAt: 1,
+func (h handler) AddNotify(ctx context.Context, msg msg2.MSG) error {
+	err := h.respondConsumer.p.Produce(ctx, msg.Content.Data)
+	if err != nil {
+		log.Println("Failed to add notification: ", err)
+		return fmt.Errorf("failed to add notification: %w", err)
 	}
-	h.srv.Notification().Add(ctx, n)
+
 	return nil
 }
 
-func (h handler) GetNotify(ctx context.Context, msg []byte) error {
-	return nil
+func (h handler) GetCurrentNotify(ctx context.Context) ([]byte, error) {
+	consume, err := h.respondConsumer.c.Consume(ctx)
+	if err != nil {
+		log.Println("Failed to get notifications with ttl: ", err)
+		return nil, fmt.Errorf("failed to get notifications with ttl: %w", err)
+	}
+
+	return consume, nil
+}
+
+func (h handler) GetOldNotify(ctx context.Context) ([]byte, error) {
+	consume, err := h.respondConsumer.c.Consume(ctx)
+	if err != nil {
+		err = fmt.Errorf("Failed to get notifications without ttl:  %w", err)
+		log.Println(err.Error())
+		
+		return nil, err
+	}
+
+	return consume, nil
 }

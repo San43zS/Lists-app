@@ -21,20 +21,13 @@ type server struct {
 	servers []launcher.Server
 }
 
-func New(srv service.Service) (launcher.Server, error) {
-	bkr, err := broker.New()
-	if err != nil {
-
-		return nil, err
-	}
-
-	h := handler.New(srv, bkr)
-	hHttp := h.Http
+func New(srv service.Service, broker broker.Broker) (launcher.Server, error) {
+	h := handler.New(srv, broker)
 
 	server := &server{
 		servers: []launcher.Server{
-			rabbit.New(bkr.RabbitMQ, h.EndPoint),
-			http.New(hHttp.InitRoutes()),
+			http.New(h.Http),
+			rabbit.New(broker.RabbitMQ, h.EndPoint),
 		},
 	}
 
@@ -44,7 +37,6 @@ func New(srv service.Service) (launcher.Server, error) {
 func (s *server) Serve(ctx context.Context) error {
 	gr, grCtx := errgroup.WithContext(ctx)
 
-	// start server
 	gr.Go(func() error {
 		return s.serve(grCtx)
 	})

@@ -13,7 +13,7 @@ func Resolver(err error) int {
 	case errors.Is(err, modelerror.ErrUnknown):
 		return http.StatusInternalServerError
 
-	case errors.Is(err, modelerror.ErrVerifyUser):
+	case errors.Is(err, modelerror.ErrWrongPassword):
 		return http.StatusBadRequest
 
 	case errors.Is(err, modelerror.UserAlreadyExistsErr):
