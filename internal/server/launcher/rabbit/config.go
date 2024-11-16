@@ -4,6 +4,7 @@ import "Lists-app/internal/broker/rabbit/config"
 
 type consumer struct {
 	topic string
+	ID    string
 }
 
 type Model struct {
@@ -13,7 +14,10 @@ type Model struct {
 func NewModel() Model {
 	model := Model{}
 
-	model.consumers = append(model.consumers, consumer{topic: config.QueueName})
+	model.consumers = append(model.consumers, consumer{
+		topic: config.QueueName,
+		ID:    config.QueueName,
+	})
 
 	return model
 }
