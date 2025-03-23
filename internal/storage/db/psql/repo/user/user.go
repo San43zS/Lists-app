@@ -53,7 +53,7 @@ func (r repository) GetById(ctx context.Context, Id int) (user22.User, error) {
 func (r repository) SignIn(ctx context.Context, user user22.User) error {
 	var existingUser user22.User
 
-	query := `SELECT * FROM users WHERE email = $1`
+	query := `SELECT * FROM users WHERE email = $1 AND password = $2`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -63,6 +63,7 @@ func (r repository) SignIn(ctx context.Context, user user22.User) error {
 	err = stmt.QueryRowContext(
 		ctx,
 		user.Email,
+		user.Password,
 	).Scan(
 		&existingUser.Id,
 		&existingUser.Email,

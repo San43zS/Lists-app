@@ -7,7 +7,6 @@ import (
 	"notify-service/internal/broker"
 	"notify-service/internal/broker/rabbit/consumer"
 	"notify-service/internal/broker/rabbit/producer"
-	message "notify-service/internal/handler/model/msg"
 )
 
 var log = logging.MustGetLogger("service")
@@ -24,16 +23,16 @@ func New(broker broker.Broker) RespCons {
 	}
 }
 
-func (s RespCons) Add(ctx context.Context, msg message.MSG) error {
-	newMsg, err := message.New().Unparse(msg)
+func (s RespCons) Add(ctx context.Context, msg msg2.MSG) error {
+	newMsg, err := msg2.New().Unparse(msg)
 	if err != nil {
-		log.Criticalf("Failed to parse notification: %v", err)
+		log.Criticalf("Failed to add notification: %w", err)
 		return fmt.Errorf("failed to add notification: %w", err)
 	}
 
 	err = s.p.Produce(ctx, newMsg)
 	if err != nil {
-		log.Criticalf("Failed to add notification: %v", err)
+		log.Criticalf("Failed to add notification: ", err)
 		return fmt.Errorf("failed to add notification: %w", err)
 	}
 
@@ -44,7 +43,8 @@ func (s RespCons) GetOld(ctx context.Context) ([]byte, error) {
 	consume, err := s.c.Consume(ctx)
 	if err != nil {
 		err = fmt.Errorf("Failed to get notifications without ttl:  %w", err)
-		log.Criticalf("%v", err)
+		log.Criticalf(err.Error())
+
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func (s RespCons) GetOld(ctx context.Context) ([]byte, error) {
 func (s RespCons) GetCurrent(ctx context.Context) ([]byte, error) {
 	consume, err := s.c.Consume(ctx)
 	if err != nil {
-		log.Criticalf("Failed to get notifications with ttl: %v", err)
+		log.Criticalf("Failed to get notifications with ttl: ", err)
 		return nil, fmt.Errorf("failed to get notifications with ttl: %w", err)
 	}
 

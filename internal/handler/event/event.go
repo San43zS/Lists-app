@@ -1,33 +1,34 @@
 package event
 
 import (
-	"encoding/json"
-	"fmt"
-	HTTP "net/http"
-	message "notify-service/internal/handler/model/msg"
+	"notify-service/internal/broker/rabbit/consumer"
+	"notify-service/internal/broker/rabbit/producer"
+	msg2 "notify-service/internal/handler/model/msg"
 	"notify-service/internal/handler/model/msg/event"
 	"notify-service/internal/service"
 	"notify-service/pkg/msgHandler"
 )
 
 type handler struct {
-	srv     service.Service
-	router  msgHandler.MsgHandler
-	handler HTTP.Handler
+	srv    service.Service
+	router msgHandler.MsgHandler
+
+	respondConsumer respCons
+}
+
+type respCons struct {
+	p producer.Producer
+	c consumer.Consumer
 }
 
 func New(srv service.Service) msgHandler.MsgHandler {
-	eventParser := func(msg []byte) (string, error) {
-		var common message.STRUCT
-		if err := json.Unmarshal(msg, &common); err != nil {
-			return "", fmt.Errorf("error while parsing msg: %w", err)
-		}
-		return common.Type, nil
+	endPointParser := func(msg msg2.MSG) (string, error) {
+		return msg.Type, nil
 	}
 
 	handler := &handler{
 		srv:    srv,
-		router: msgHandler.New(eventParser),
+		router: msgHandler.New(endPointParser),
 	}
 
 	handler.initHandler()
@@ -36,8 +37,7 @@ func New(srv service.Service) msgHandler.MsgHandler {
 }
 
 func (h handler) initHandler() {
-
-	h.router.Add(event.ShowCurrent, h.ShowCurrent)
-	h.router.Add(event.ShowOld, h.ShowOld)
-
+	h.router.Add(event.AddNotify, h.AddNotify)
+	h.router.Add(event.GetCurrentNotify, h.GetCurrentNotify)
+	h.router.Add(event.GetOldNotify, h.GetOldNotify)
 }

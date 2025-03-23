@@ -24,13 +24,13 @@ func New(dial *amqp.Channel) Consumer {
 func (c consumer) Consume(ctx context.Context) ([]byte, error) {
 
 	msgs, err := c.dial.Consume(
-		config.ConsumerQueueName, // queue
-		"",                       // consumer
-		false,                    // auto-ack
-		false,                    // exclusive
-		false,                    // no-local
-		true,                     // no-wait
-		nil,                      // args
+		config.ConsumerQueueName,   // queue
+		config.UserServiceConsumer, // consumer
+		false,                      // auto-ack
+		false,                      // exclusive
+		false,                      // no-local
+		true,                       // no-wait
+		nil,                        // args
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to consume message: %w", err)

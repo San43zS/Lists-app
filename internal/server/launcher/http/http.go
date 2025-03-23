@@ -31,6 +31,7 @@ func New(handler http.Handler) launcher.Server {
 
 func (s *server) Serve(ctx context.Context) error {
 	errCh := make(chan error)
+
 	go func() {
 		defer close(errCh)
 

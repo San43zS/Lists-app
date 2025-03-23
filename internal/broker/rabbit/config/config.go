@@ -13,13 +13,13 @@ const (
 )
 
 const (
-	ConsumerQueueName    = "redQueue"
+	ConsumerQueueName    = "greenQueue"
 	ConsumerExchangeName = "test"
 )
 
 const (
 	ProducerRoutingKey = "yellow"
-	ConsumerRoutingKey = "redQueue"
+	ConsumerRoutingKey = "green"
 )
 
 const (

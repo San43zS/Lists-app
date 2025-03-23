@@ -1,35 +1,26 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	"net/http"
 	"notify-service/internal/service"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type handler struct {
-	srv      service.Service
-	upgrader *websocket.Upgrader
+	srv service.Service
 }
 
 func New(service service.Service) http.Handler {
-
-	handler := &handler{
+	handler := handler{
 		srv: service,
-		upgrader: &websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		},
 	}
 
-	return handler.InitRoutes(handler.upgrader)
+	return handler.InitRoutes()
 }
 
-func (h handler) InitRoutes(up *websocket.Upgrader) *gin.Engine {
+func (h handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.SignUp)
@@ -37,24 +28,11 @@ func (h handler) InitRoutes(up *websocket.Upgrader) *gin.Engine {
 		auth.POST("/sign-out", h.SignOut)
 	}
 
-	notify := router.Group("/notify")
-	{
-		notify.POST("/add", h.AddNotify)
-		notify.POST("/get-current-notify", h.GetCurrentNotify)
-		notify.GET("/get-old-notify", h.GetOldNotify)
-	}
-
 	ws := router.Group("/ws")
 	{
-		ws.Use(func(c *gin.Context) {
-			conn, err := configuration(c, up)
-			if err != nil {
-				return
-			}
-			defer conn.Close()
-		})
-		ws.GET("/", h.GetStatus)
-		ws.GET("/confirm", h.ConfirmDelivery)
+		ws.POST("/add", h.AddNotify)
+		ws.GET("/get-current-notify", h.GetCurrentNotify)
+		ws.GET("/get-old-notify", h.GetOldNotify)
 	}
 
 	return router

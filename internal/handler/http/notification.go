@@ -5,23 +5,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	httpServError "notify-service/internal/handler/error"
-	event2 "notify-service/internal/handler/event"
 	msg "notify-service/internal/handler/model/msg"
 	"notify-service/internal/handler/model/msg/event"
-	"time"
 )
 
 func (h handler) AddNotify(c *gin.Context) {
-	var notify msg.Notify
+	var notify msg.Test
 
 	if err := c.BindJSON(&notify); err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 	}
 
-	m := msg.MSG{
-		Type: event.AddNotify,
+	ht := msg.Data{
 		Data: []byte(notify.Data),
-		TTL:  notify.TTL,
+	}
+
+	m := msg.MSG{
+		Type:    event.AddNotify,
+		Content: ht,
 	}
 
 	err := h.srv.Notification().Add(context.Background(), m)
@@ -30,38 +31,26 @@ func (h handler) AddNotify(c *gin.Context) {
 		return
 	}
 
-	c.JSONP(http.StatusOK, "Notification successfully added")
+	c.JSONP(http.StatusOK, "grge")
+
 }
 
 func (h handler) GetCurrentNotify(c *gin.Context) {
-
-	m := msg.MSG{
-		Type: event.GetCurrentNotify,
-	}
-
-	err := h.srv.Notification().Add(context.Background(), m)
+	message, err := h.srv.Notification().GetCurrent(context.Background())
 	if err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}
 
-	time.Sleep(2000 * time.Millisecond)
-	c.JSONP(http.StatusOK, event2.MasCurrent)
+	c.JSONP(httpServError.Resolver(err), message)
 }
 
 func (h handler) GetOldNotify(c *gin.Context) {
-
-	m := msg.MSG{
-		Type: event.GetOldNotify,
-	}
-
-	err := h.srv.Notification().Add(context.Background(), m)
+	message, err := h.srv.Notification().GetOld(context.Background())
 	if err != nil {
 		c.JSONP(httpServError.Resolver(err), err.Error())
 		return
 	}
 
-	time.Sleep(2000 * time.Millisecond)
-	c.JSONP(http.StatusOK, event2.MasOld)
-
+	c.JSONP(httpServError.Resolver(err), message)
 }

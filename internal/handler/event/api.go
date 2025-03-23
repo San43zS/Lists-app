@@ -1,33 +1,40 @@
 package event
 
 import (
+	msg2 "notify-service/internal/handler/model/msg"
 	"context"
-	"encoding/json"
 	"fmt"
-	message "notify-service/internal/handler/model/msg"
+	"log"
 )
 
-var MasCurrent message.STRUCT
-var MasOld message.STRUCT
-
-func (h handler) ShowCurrent(ctx context.Context, msg []byte) error {
-	var temp message.STRUCT
-	err := json.Unmarshal(msg, &temp)
+func (h handler) AddNotify(ctx context.Context, msg msg2.MSG) error {
+	err := h.respondConsumer.p.Produce(ctx, msg.Content.Data)
 	if err != nil {
-		return fmt.Errorf("error while parsing(unmarshal) msg: %w", err)
+		log.Println("Failed to add notification: ", err)
+		return fmt.Errorf("failed to add notification: %w", err)
 	}
 
-	MasCurrent = temp
 	return nil
 }
 
-func (h handler) ShowOld(ctx context.Context, msg []byte) error {
-	var temp message.STRUCT
-	err := json.Unmarshal(msg, &temp)
+func (h handler) GetCurrentNotify(ctx context.Context) ([]byte, error) {
+	consume, err := h.respondConsumer.c.Consume(ctx)
 	if err != nil {
-		return fmt.Errorf("error while parsing(unmarshal) msg: %w", err)
+		log.Println("Failed to get notifications with ttl: ", err)
+		return nil, fmt.Errorf("failed to get notifications with ttl: %w", err)
 	}
 
-	MasOld = temp
-	return nil
+	return consume, nil
+}
+
+func (h handler) GetOldNotify(ctx context.Context) ([]byte, error) {
+	consume, err := h.respondConsumer.c.Consume(ctx)
+	if err != nil {
+		err = fmt.Errorf("Failed to get notifications without ttl:  %w", err)
+		log.Println(err.Error())
+		
+		return nil, err
+	}
+
+	return consume, nil
 }
